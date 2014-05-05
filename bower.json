@@ -1,12 +1,12 @@
 {
   "name": "parseangular",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "authors": [
-    ""
+    "Jamie Sutherland <me@jamiesutherland.com>"
   ],
-  "description": "",
-  "keywords": [],
-  "license": "",
+  "description": "An AngularJS module for interacting with the Parse.com REST API",
+  "keywords": ["angularjs", "parse"],
+  "license": "MIT",
   "ignore": [],
   "main": [],
   "dependencies": {

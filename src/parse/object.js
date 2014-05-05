@@ -1,96 +1,129 @@
 
 (function (angular) { 'use strict';
 
-  angular.module('parseangular', [])
-    .provider('Parseangular', function ParseangularProvider($httpProvider) {
 
-      var $phttp;
+  var ParseObject = function (Parseangular) {
+    this.parse = Parseangular;
+  };
 
-      var apiUrl = 'https://api.parse.com/'
+  /**
+   * @ngdoc method
+   * @name ParseObject#new
+   *
+   * @description Create a new instance of this service. Allows you to create multiple services quickly
+   * for each object you need to access.
+   *
+   * @param className
+   * @returns {ParseObject}
+   */
+  ParseObject.prototype.new = function (className) {
+    var obj = new ParseObject(this.parse);
+    obj.className = className
+    return obj;
+  };
 
-      var version = 1;
+  /**
+   * @ngdoc method
+   * @name ParseObject#getUrl
+   *
+   * @description Returns the url path to access this parse data object on the REST API
+   *
+   * @param {string} `Optional` - Specify the ID to get the URL to that specific object
+   * @returns {string} The url to the object on parse
+   */
+  ParseObject.prototype.getUrl = function () {
+    var id = arguments[0] || null;
+    return id ?
+      this.parse.getBaseUrl() + '/classes/' + this.className + '/' + id :
+      this.parse.getBaseUrl() + '/classes/' + this.className;
+  };
 
-      // TODO: Make these configurable through the provider
-      this.APP_ID = '',
-      this.REST_API_KEY = '';
-
-      var config = {};
-
-      this.setBaseUrl = function (url) {
-        apiUrl = url;
-        return this;
-      };
-
-      this.getBaseUrl = function () {
-        return apiUrl + version;
-      };
-
-
-      this.getHeaders = function () {
-        return config.headers;
-      };
-
-      this.initialise = function (appId, apiKey) {
-        config.appId = appId;
-        config.apiKey = apiKey;
-        config.headers = {
-          'X-Parse-Application-Id': appId,
-          'X-Parse-REST-API-Key': apiKey
-        };
-      };
-
-      this.setDefaultHttpHeaders = function(headers) {
-        angular.extend(config.headers, headers);
-      };
-
-      this.$get = ['$http', function ($http) {
-
-        // Make a copy of the $http service so we can have our own defaults for this service
-        $phttp = angular.copy($http);
-
-        var classUrl = function (className, id) {
-          return id ? apiUrl + version + '/classes/' + className + '/' + id : apiUrl + version + '/classes/' + className;
-        };
-
-        var find = function (className, params) {
-          return $phttp.get(classUrl(className), params);
-        };
-
-        var get = function (className, id, params) {
-          return $phttp.get(classUrl(className, id), params);
-        };
-
-        var create = function (className, data, params) {
-          return $phttp.post(classUrl(className), data, params).then(function (result) {
-            Object.defineProperty(result.data, 'id', Object.getOwnPropertyDescriptor(result.data, 'objectId'));
-            delete(result.data['objectId']);
-            angular.extend(data, result.data);
-            return data;
-          });
-        };
-
-        var update = function (className, id, data, params) {
-          return $phttp.put(classUrl(className, id), data, params).then(function (result) {
-            angular.extend(data, result.data);
-            return data;
-          });
-        };
-
-        var destroy = function (className, id, params) {
-          if (angular.isObject(id)) {
-            id = id.id;
-          }
-          return $phttp.delete(classUrl(className, id), params);
-        };
-
-        return {
-          find: find,
-          get: get,
-          create: create,
-          update: update,
-          destroy: destroy
-        };
-      }];
+  /**
+   * @ngdoc method
+   * @name ParseObject#get
+   *
+   * @description
+   *
+   * @param id
+   * @param params
+   * @returns {*}
+   */
+  ParseObject.prototype.get = function (id, params) {
+    return this.parse.request('GET', this.getUrl(id), null, params).then(function (result) {
+      return result.data;
     });
+  };
+
+  /**
+   * @ngdoc method
+   * @name ParseObject#find
+   *
+   * @description
+   *
+   * @param params
+   * @returns {*}
+   */
+  ParseObject.prototype.find = function (params) {
+    return this.parse.request('GET', this.getUrl(), null, params).then(function (result) {
+      return result.data;
+    });
+  };
+
+  /**
+   * @ngdoc method
+   * @name ParseObject#create
+   *
+   * @description
+   *
+   * @param data
+   * @param params
+   * @returns {*}
+   */
+  ParseObject.prototype.create = function (data, params) {
+    return this.parse.request('POST', this.getUrl(), data, params).then(function (result) {
+      return angular.extend(data, result.data);
+    });
+  };
+
+  /**
+   *
+   * @ngdoc method
+   * @name ParseObject#update
+   *
+   * @description
+   *
+   * @param id
+   * @param data
+   * @param params
+   * @returns {*}
+   */
+  ParseObject.prototype.update = function (id, data, params) {
+    return this.parse.request('PUT', this.getUrl(id), data, params).then(function (result) {
+      return angular.extend(data, result.data);
+    });
+  };
+
+  /**
+   * @ngdoc method
+   * @name ParseObject#destroy
+   *
+   * @description
+   *
+   * @param id
+   * @param params
+   * @returns {*}
+   */
+  ParseObject.prototype.destroy = function (id, params) {
+    return this.parse.request('DELETE', this.getUrl(id), null, params);
+  };
+
+  /**
+   * @ngdoc service
+   * @name ParseObject
+   *
+   * @description The base model for all data objects held in Parse
+   *
+   */
+  angular.module('parseangular').service('ParseObject', ['Parseangular', ParseObject]);
 
 })(angular);
