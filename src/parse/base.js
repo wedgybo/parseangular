@@ -8,11 +8,17 @@
 
     var config = {
       baseUrl: 'https://api.parse.com/',
-      version: '1'
+      version: '1',
+      appId: '',
+      apiKey: ''
     };
 
     return {
       initialize: function(appId, apiKey) {
+
+        config.appId = appId;
+        config.apiKey = apiKey;
+
         config.headers = {
           'X-Parse-Application-Id': appId,
           'X-Parse-REST-API-Key': apiKey,
@@ -25,7 +31,7 @@
       getHeaders: function () {
         return config.headers;
       },
-      $get: ['$http', function ($http) {
+      $get: ['$http', '$window', function ($http, $window) {
         return {
           request: function (method, url, data, params, type) {
 
@@ -46,8 +52,32 @@
               headers: config.headers
             });
           },
+          store: {
+            get: function () {
+              $window.localStorage.getItem('Parse/' + config.appId + '/' + key, data);
+            },
+            set: function (key, data) {
+              $window.localStorage.setItem('Parse/' + config.appId + '/' + key, data);
+            },
+            removeAll: function () {
+              Object.keys($window.localStorage).forEach(function (key) {
+                if (/Parse\/ + config.appId + /.test(key)) {
+                  $window.localStorage.removeItem(key);
+                }
+              });
+            },
+            remove: function (key) {
+              $window.localStorage.removeItem('Parse/' + config.appId + '/' + key);
+            }
+          },
           getBaseUrl: function () {
             return config.baseUrl + config.version;
+          },
+          setAppId: function (appId) {
+
+          },
+          setApiKey: function (apiKey) {
+            //config.headers
           }
         }
       }]

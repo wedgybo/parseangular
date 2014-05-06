@@ -3,13 +3,24 @@ describe('Parseangular', function () {
 
   describe('User', function () {
 
-    var ParseUser, httpBackend, user, newUser, createdAtDate = new Date();
+    var ParseUser, httpBackend, window, user, newUser, store, createdAtDate = new Date();
 
-    beforeEach(module('parseangular'));
+    beforeEach(function () {;
 
-    beforeEach(inject(function (_ParseUser_, _$httpBackend_) {
+      angular.module('test.parseangular', function () {}).config(function (ParseangularProvider) {
+        ParseangularProvider.initialize('appid', 'apikey');
+      });
+      module('parseangular', 'test.parseangular');
+    });
+
+    beforeEach(inject(function (_ParseUser_, _$httpBackend_, _$window_) {
+
       ParseUser = _ParseUser_;
+      ParseUser.parse.setAppId('appid');
+      ParseUser.parse.setApiKey('apikey');
+
       httpBackend = _$httpBackend_;
+      window = _$window_;
 
       newUser = {
         username: 'cooldude6',
@@ -24,6 +35,16 @@ describe('Parseangular', function () {
         "updatedAt": createdAtDate,
         "objectId": "g7y9tkhB7O"
       };
+
+      store = {};
+
+      sinon.stub(window.localStorage, 'setItem', function (key, data) {
+        return store[key] = data;
+      });
+
+      sinon.stub(window.localStorage, 'getItem', function (key) {
+        return store[key];
+      });
 
       // List users
       httpBackend.whenGET(ParseUser.getUrl('users')).respond(200, { results: [user] });
@@ -55,7 +76,13 @@ describe('Parseangular', function () {
 
     }));
 
-    it('should be able to sign up', function () {
+    afterEach(function () {
+      // Reset the spies after each test
+      window.localStorage.setItem.restore();
+      window.localStorage.getItem.restore();
+    });
+
+    it('should be able to sign up a new user', function () {
 
       httpBackend.expectPOST(ParseUser.getUrl('users'));
 
@@ -65,6 +92,9 @@ describe('Parseangular', function () {
         result.objectId.should.equal('g7y9tkhB7O');
         result.sessionToken.should.equal('pnktnjyb996sj4p156gjtp4im');
         result.createdAt.toDateString().should.equal(createdAtDate.toDateString());
+
+        expect(store).to.not.be.empty;
+        expect(window.localStorage.setItem.called).to.be.true;
       });
 
       httpBackend.flush();

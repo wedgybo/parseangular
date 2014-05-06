@@ -36,6 +36,9 @@
    * @returns {*}
    */
   ParseUser.prototype.signUp = function (user) {
+
+    var scope = this;
+
     if (!angular.isString(user.username)) {
       throw new ParseUserException('Field username is required');
     }
@@ -45,6 +48,7 @@
     }
 
     return this.parse.request('POST', this.getUrl('users'), user).then(function (result) {
+      scope.parse.store.set('currentUser', result.data);
       return result.data;
     });
   };
