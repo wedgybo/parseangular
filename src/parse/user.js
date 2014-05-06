@@ -26,6 +26,15 @@
   };
 
 
+  /**
+   * @ngdoc method
+   * @name ParseUser#signUp
+   *
+   * @description Registers a new user with the Parse service for your application
+   *
+   * @param user
+   * @returns {*}
+   */
   ParseUser.prototype.signUp = function (user) {
     if (!angular.isString(user.username)) {
       throw new ParseUserException('Field username is required');
@@ -88,22 +97,6 @@
   ParseUser.prototype.find = function (params) {
     return this.parse.request('GET', this.getUrl(), null, params).then(function (result) {
       return result.data;
-    });
-  };
-
-  /**
-   * @ngdoc method
-   * @name ParseUser#create
-   *
-   * @description
-   *
-   * @param data
-   * @param params
-   * @returns {*}
-   */
-  ParseUser.prototype.create = function (data, params) {
-    return this.parse.request('POST', this.getUrl(), data, params).then(function (result) {
-      return angular.extend(data, result.data);
     });
   };
 

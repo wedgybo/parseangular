@@ -1,12 +1,6 @@
 
 describe('Parseangular', function () {
 
-  function classUrl(path, id) {
-    return id ?
-      'https://api.parse.com/1/' + path + '/' + id :
-      'https://api.parse.com/1/' + path;
-  }
-
   describe('User', function () {
 
     var ParseUser, httpBackend, user, newUser, createdAtDate = new Date();
@@ -103,10 +97,14 @@ describe('Parseangular', function () {
         result.should.be.a('object');
         result.sessionToken.should.be.a('string');
         result.sessionToken.should.equal('pnktnjyb996sj4p156gjtp4im');
+
+        // TODO: Check that the session token is saved to local storage / cookie
       });
 
       httpBackend.flush();
     });
+
+    it('should be able to logout');
 
     it('should be able to reset a password', function () {
 
@@ -114,13 +112,17 @@ describe('Parseangular', function () {
 
       ParseUser.requestPasswordReset('test@test.com').then(function (result) {
         result.should.be.a('object');
-        // TODO: Check object is empty when I get the internet again to look up how :)
+        result.should.be.empty;
       });
 
       httpBackend.flush();
     });
 
-    it('should delete an object', function () {
+    it('should be able to switch users');
+
+    it('should be able to fetch the current user');
+
+    it('should delete a user', function () {
 
       httpBackend.expectDELETE(ParseUser.getUrl('users', user.objectId));
 

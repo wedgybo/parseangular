@@ -1,9 +1,7 @@
 {
   "name": "parseangular",
   "version": "0.0.0",
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
@@ -24,7 +22,8 @@
     "dgeni": "0.2.2",
     "dgeni-packages": "0.8.1",
     "canonical-path": "0.0.2",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "karma-story-reporter": "https://github.com/sublimino/karma-story-reporter/tarball/0.2.3-dev"
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
