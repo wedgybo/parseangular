@@ -108,6 +108,18 @@ describe('Parseangular', function () {
       httpBackend.flush();
     });
 
+    it('should be able to reset a password', function () {
+
+      httpBackend.expectPOST(ParseUser.getUrl('requestPasswordReset'), { email: 'test@test.com' }).respond(200, {});
+
+      ParseUser.requestPasswordReset('test@test.com').then(function (result) {
+        result.should.be.a('object');
+        // TODO: Check object is empty when I get the internet again to look up how :)
+      });
+
+      httpBackend.flush();
+    });
+
     it('should delete an object', function () {
 
       httpBackend.expectDELETE(ParseUser.getUrl('users', user.objectId));

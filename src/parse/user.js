@@ -63,6 +63,21 @@
 
   /**
    * @ngdoc method
+   * @name ParseUser#requestPasswordReset
+   *
+   * @description Send out a parse password reset email to the specified email address
+   *
+   * @param {string} email
+   * @returns {Object}
+   */
+  ParseUser.prototype.requestPasswordReset = function (email) {
+    return this.parse.request('POST', this.getUrl('requestPasswordReset'), { email: email }).then(function (result) {
+      return result.data;
+    });
+  };
+
+  /**
+   * @ngdoc method
    * @name ParseUser#find
    *
    * @description
